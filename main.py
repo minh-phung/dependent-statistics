@@ -13,15 +13,16 @@ plt.rcParams['figure.dpi'] = 500
 n = 1000
 
 x = np.linspace(-1, 1, n)
+
+k_range = range(1, int(0.10*n))
+
+#-------------------------------------------------------------------------
 poly_order = range(1, 100)
 
 poly_val = np.column_stack([x**k for k in poly_order])
 y_poly = pd.DataFrame(
     data=poly_val, columns=poly_order
 )
-
-
-k_range = range(1, int(0.10*n))
 
 '''
 mi_poly = pd.DataFrame(index = k_range, columns = poly_order)
@@ -42,7 +43,19 @@ mi_poly.to_csv("mi/poly.csv", index = False)
 mi_poly = pd.read_csv("mi/poly.csv")
 mi_poly.columns = mi_poly.columns.astype(int)
 
+#-------------------------------------------------------------------------
+y_exp = np.exp(x)
 
+mi_exp = pd.DataFrame(index = k_range, columns = [0])
+
+for each_k in k_range:
+	mi_exp.loc[each_k, 0] = im.estimator(x, y_exp,
+                	                     measure = 'mi',
+                        	             approach = 'ksg',
+                                	     k = each_k,
+                                       	     noise_level = 0).result()
+
+#-------------------------------------------------------------------------
 mi_mean = np.zeros(len(poly_order))
 mi_lower = np.zeros(len(poly_order))
 mi_upper = np.zeros(len(poly_order))
@@ -54,7 +67,7 @@ k_95_percentile = np.zeros(len(poly_order))
 k_75_percentile = np.zeros(len(poly_order))
 
 
-'''
+
 for i, each_order in enumerate(poly_order):
 		
 	y = mi_poly[each_order]
@@ -75,12 +88,6 @@ for i, each_order in enumerate(poly_order):
 	idx_75 = ((y-q_75)**2).idxmin()
 	k_75_percentile[i] = idx_75
 	
-	# ---------------------------
-	#plt.scatter(y.index, y.values)
-	#plt.xlabel("K-val")
-	#plt.ylabel("MI score")
-	#plt.savefig("mi/poly/hist/" + str(each_order) + ".png")
-	#plt.close()
 	
 	
 plt.errorbar(
@@ -89,6 +96,12 @@ plt.errorbar(
     	yerr = [mi_lower, mi_upper],
     	elinewidth = 0.5,
 )
+
+plt.axhline(y = np.mean(y_exp), color = 'red', linestyle = '--', alpha = 0.5)
+plt.axhline(y = np.quantile(y_exp, .95), color = 'grey', linestyle = '--', alpha = 0.5)
+plt.axhline(y = np.quantile(y_exp, .05), color = 'grey', linestyle = '--', alpha = 0.5)
+
+
 
 plt.xlabel("Polynomial order")
 plt.ylabel("MI score (KSG)")
@@ -113,7 +126,9 @@ plt.ylabel("75th percentile KSG - associated k value")
 plt.savefig("mi/poly/75th_k.png")
 plt.close()
 
-'''
+
+
+#-------------------------------------------------------------------------
 
 y_poly_add_1  = pd.DataFrame(np.zeros(y_poly.shape),
 			     columns = poly_order)
@@ -181,6 +196,7 @@ mi_poly_add_n1 = pd.read_csv("mi/poly_add_n1.csv")
 mi_poly_add_n1.columns = mi_poly_add_n1.columns.astype(int)
 
 
+#-------------------------------------------------------------------------
 
 add_1_comparison = pd.DataFrame(index = range(4), columns = poly_order)
 add_2_comparison = pd.DataFrame(index = range(4), columns = poly_order)
@@ -189,6 +205,7 @@ add_n1_comparison = pd.DataFrame(index = range(4), columns = poly_order)
 
 quantile_list = [1, .95, .75]
 
+'''
 
 for each_order in poly_order:
 
@@ -224,10 +241,11 @@ for each_order in poly_order:
 
 
 var_list = ["100th", "95th", "75th", "mean"]
+'''
 
-print(add_1_comparison)
 
-
+#-------------------------------------------------------------------------
+'''
 for i, each_var in enumerate(var_list):
 	
 	plt.scatter(poly_order, add_1_comparison.loc[i])
@@ -250,3 +268,4 @@ for i, each_var in enumerate(var_list):
 
 	
 
+'''
