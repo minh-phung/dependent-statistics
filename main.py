@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import method
 from scipy.stats import norm
+from sklearn.preprocessing import MinMaxScaler
 
 
 n = 1000
@@ -9,6 +10,9 @@ x = np.linspace(-1, 1, n)
 mi_ksg_k = range(1, int(0.10*n))
 np.random.seed(1)
 
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+# Computing each y values: polynomial, periodic, exponential, gaussian, and 2 noise
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
 
@@ -39,6 +43,7 @@ y_gaus = pd.DataFrame(data = norm.pdf(x, loc = 0, scale = 0.25),
 	   	      columns = [0])
 
 #-------------------------------------------
+# Noise: uniform, gaussian
 #------------------------------------------- 
 y_noise_uni = pd.DataFrame(data = np.random.uniform(low = -1, high = 1, size = n),
 			   columns = [0])
@@ -56,23 +61,27 @@ y_df = [y_poly, y_sin, y_cos, y_exp, y_gaus,
 
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
-var = "pear_corr"
+# Computing different statistics
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+stat = ["pear_corr", "dist_corr"]
 
 '''
-for i, each_y in enumerate(y_var):
-	print(var + "------------------------" + each_y)
+for each_stat in stat:
+	for i, each_y in enumerate(y_var):
+		print(each_stat + "------------------------" + each_y)
 	
-	each_result = pd.DataFrame(index = [0], columns = y_df[i].columns)
-	each_result.loc[0] = method.compute(x, y_df[i], stat = var)
+		each_result = pd.DataFrame(index = [0], columns = y_df[i].columns)
+		each_result.loc[0] = method.compute(x, y_df[i], stat = each_stat)
 	
-	each_result.to_csv(var + "/y_" + each_y + ".csv", index = False)
+		each_result.to_csv(each_stat + "/y_" + each_y + ".csv", index = False)
 '''
 #-------------------------------------------
-var = "mi_ksg"
+stat = "mi_ksg"
 
 '''
 for i, each_y in enumerate(y_var):
-	print(var + "------------------------" + each_y)
+	print(stat + "------------------------" + each_y)
 	
 	each_result = pd.DataFrame(index = mi_ksg_k, columns = y_df[i].columns)
 	
@@ -80,26 +89,57 @@ for i, each_y in enumerate(y_var):
 		print("----")
 		print(each_k)
 		each_result.loc[each_k] = method.compute(x, y_df[i], 
-							 stat = var, 
+							 stat = stat, 
 							 k_val = each_k)
-	each_result.to_csv(var + "/y_" + each_y + ".csv", index = False)
+	each_result.to_csv(stat + "/y_" + each_y + ".csv", index = False)
 '''
+
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+# Plot
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+
 #-------------------------------------------
-var = "dist_corr"
+# per y (poly, periodic, exp) , plot all MinMaxScaler of statistics: 
+# 	absolute pear_corr, quantile(mi_ksg), dist_corr
+#-------------------------------------------
+y_val_subset = ["poly", "sin", "cos", "exp"]
 
-'''
-for i, each_y in enumerate(y_var):
-	print(var + "------------------------" + each_y)
+mi_quantile = 0.95
+scaler = MinMaxScaler()
+
+for each_y in y_val_subset:
+	print(each_y + " ------------")
 	
-	each_result = pd.DataFrame(index = [0], columns = y_df[i].columns)
-	each_result.loc[0] = method.compute(x, y_df[i], stat = var)
+	# ------------------
+	pear_corr_df = pd.read_csv("pear_corr/y_" + each_y + ".csv")
 	
-	each_result.to_csv(var + "/y_" + each_y + ".csv", index = False)
-'''
-#-----------------------------------------------------------------------------------
-#-----------------------------------------------------------------------------------
+	pear_corr_val = pear_corr_df.values.reshape(-1, 1)
+	pear_corr_val_abs = np.absolute(pear_corr_val)
+	
+	pear_corr_scaled = scaler.fit_transform(pear_corr_val_abs).flatten()
 
-var_list = ["pear_corr", "mi_ksg", "dist_corr"]
+	# ------------------
+	dist_corr_df = pd.read_csv("dist_corr/y_" + each_y + ".csv")
+	
+	dist_corr_val = dist_corr_df.values.reshape(-1, 1)
+	
+	dist_corr_scaled = scaler.fit_transform(dist_corr_val).flatten()
 
+	# ------------------
+	mi_ksg_df = pd.read_csv("mi_ksg/y_" + each_y + ".csv")
 
+	mi_ksg_val = np.quantile(mi_ksg_df, mi_quantile, axis = 0).reshape(-1, 1)
+	
+	mi_ksg_scaled = scaler.fit_transform(mi_ksg_val).flatten()	
 
+	# -------------------------------------
+
+	print(pear_corr_scaled.shape)
+	print(dist_corr_scaled.shape)
+	print(mi_ksg_scaled.shape)
+
+	
+	
+	
