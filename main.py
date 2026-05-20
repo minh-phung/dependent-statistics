@@ -82,3 +82,4 @@ for i, each_y in enumerate(y_var):
 		print(each_k)
 		print( method.compute(x, y_df[i], stat = var, k_val = each_k) )
 	break
+	
