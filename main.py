@@ -60,8 +60,7 @@ y_df = [y_poly, y_sin, y_cos, y_exp, y_gaus,
 var = "pear_corr"
 
 for i, each_y in enumerate(y_var):
-	print("------------------------")
-	print(each_y)
+	print("------------------------" + each_y)
 	
 	each_result = pd.DataFrame(index = [0], columns = y_df[i].columns)
 	each_result.loc[0] = method.compute(x, y_df[i], stat = var)
@@ -73,13 +72,29 @@ for i, each_y in enumerate(y_var):
 var = "mi_ksg"
 
 for i, each_y in enumerate(y_var):
-	print("------------------------")
-	print(each_y)
+	print("------------------------" + each_y)
 	
 	each_result = pd.DataFrame(index = mi_ksg_k, columns = y_df[i].columns)
 	
 	for j, each_k in enumerate(mi_ksg_k):
+		print("----")
 		print(each_k)
-		print( method.compute(x, y_df[i], stat = var, k_val = each_k) )
-	break
+		each_result.loc[each_k] = method.compute(x, y_df[i], 
+							 stat = var, 
+							 k_val = each_k)
+	print(each_result)
+	each_result.to_csv(var + "/y_" + each_y + ".csv", index = False)
+
+#-------------------------------------------
+'''
+var = "dist_corr"
+
+for i, each_y in enumerate(y_var):
+	print("------------------------" + each_y)
 	
+	each_result = pd.DataFrame(index = [0], columns = y_df[i].columns)
+	each_result.loc[0] = method.compute(x, y_df[i], stat = var)
+	
+	each_result.to_csv(var + "/y_" + each_y + ".csv", index = False)
+'''
+
