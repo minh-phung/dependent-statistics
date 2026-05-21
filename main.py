@@ -4,6 +4,13 @@ import method
 from scipy.stats import norm
 from sklearn.preprocessing import MinMaxScaler
 
+import matplotlib
+matplotlib.use('Agg') 
+import matplotlib.pyplot as plt
+
+plt.rcParams["figure.figsize"] = (10, 6) 
+plt.rcParams['figure.dpi'] = 500 
+
 
 n = 1000
 x = np.linspace(-1, 1, n)
@@ -100,46 +107,47 @@ for i, each_y in enumerate(y_var):
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
 
-#-------------------------------------------
-# per y (poly, periodic, exp) , plot all MinMaxScaler of statistics: 
-# 	absolute pear_corr, quantile(mi_ksg), dist_corr
-#-------------------------------------------
-y_val_subset = ["poly", "sin", "cos", "exp"]
+y_val_subset_0 = ["poly", "sin", "cos", "exp"]
+y_val_subset_1 = ["gaus", "noise_uni", "noise_gaus"]
+
 
 mi_quantile = 0.95
 scaler = MinMaxScaler()
 
-for each_y in y_val_subset:
+for each_y_0 in y_val_subset_0:
 	print(each_y + " ------------")
 	
 	# ------------------
-	pear_corr_df = pd.read_csv("pear_corr/y_" + each_y + ".csv")
+	pear_corr_df = pd.read_csv("pear_corr/y_" + each_y_0 + ".csv")
 	
-	pear_corr_val = pear_corr_df.values.reshape(-1, 1)
-	pear_corr_val_abs = np.absolute(pear_corr_val)
+	pear_corr_abs_val = np.abs(pear_corr_df.values).flatten()
 	
-	pear_corr_scaled = scaler.fit_transform(pear_corr_val_abs).flatten()
-
 	# ------------------
-	dist_corr_df = pd.read_csv("dist_corr/y_" + each_y + ".csv")
+	dist_corr_df = pd.read_csv("dist_corr/y_" + each_y_0 + ".csv")
 	
-	dist_corr_val = dist_corr_df.values.reshape(-1, 1)
-	
-	dist_corr_scaled = scaler.fit_transform(dist_corr_val).flatten()
-
-	# ------------------
-	mi_ksg_df = pd.read_csv("mi_ksg/y_" + each_y + ".csv")
-
-	mi_ksg_val = np.quantile(mi_ksg_df, mi_quantile, axis = 0).reshape(-1, 1)
-	
-	mi_ksg_scaled = scaler.fit_transform(mi_ksg_val).flatten()	
+	dist_corr_val = dist_corr_df.values.flatten()
 
 	# -------------------------------------
-
-	print(pear_corr_scaled.shape)
-	print(dist_corr_scaled.shape)
-	print(mi_ksg_scaled.shape)
-
+	x_val = pear_corr_df.columns.astype(float)
 	
+	plt.scatter(x_val, pear_corr_abs_val, 
+		    color = "red", label = "abs(pear_corr)")
+	
+	plt.scatter(x_val, dist_corr_val,
+		    color = "blue", label = "dist_corr")
+	
+	
+	
+
+	plt.title(each_y)
+	plt.xlabel("parameter")
+	plt.ylabel("score")
+
+	plt.ylim(0, 1)
+	plt.legend()
+
+	plt.savefig("plot/" + each_y_0 + "_corr.png")
+	plt.close()
+
 	
 	
