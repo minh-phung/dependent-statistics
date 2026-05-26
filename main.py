@@ -75,10 +75,10 @@ y_df = [y_poly, y_perio_sin, y_perio_cos, y_exp, y_gaus,
 # Computing different statistics
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
-stat = ["pear_corr", "dist_corr"]
+corr_stat = ["pear_corr", "dist_corr"]
 
 '''
-for each_stat in stat:
+for each_stat in corr_stat:
 	for i, each_y in enumerate(y_var):
 		print(each_stat + "------------------------" + each_y)
 	
@@ -219,13 +219,11 @@ for y_0 in y_val_subset_0:
 
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
-# Compute 
+# Compute y basis addition
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
-
 
 y_val_subset_0 = ["poly", "perio_sin", "perio_cos", "exp"]
-
 y_df_subset_0 = [y_poly, y_perio_sin, y_perio_cos, y_exp]
 
 #-------------------------------------------
@@ -235,19 +233,59 @@ perio_sin1 = y_perio_sin[1].values
 perio_cos1 = y_perio_cos[1].values
 exp1 = y_exp[1].values
 
+add_var = ["poly1", "perio_sin1", "perio_cos1", "exp1"]
+add_val = [poly1, perio_sin1, perio_cos1, exp1]
+
 #-------------------------------------------
 
-y_df_subset_0_add_poly1 	= [None]*len(y_df_subset_0)
-y_df_subset_0_add_perio_sin1 	= [None]*len(y_df_subset_0)
-y_df_subset_0_add_perio_cos1 	= [None]*len(y_df_subset_0)
-y_df_subset_0_add_exp1 		= [None]*len(y_df_subset_0)
+y_df_subset_0_add =  np.full((len(y_val_subset_0), len(add_var)), None, dtype = object)
 
+for i, each_y_0 in enumerate(y_df_subset_0):
+	for j, each_add in enumerate(add_val):
+		y_df_subset_0_add[i, j] = each_y_0.apply(lambda x: x + each_add)
 
-for i, each_df in enumerate(y_df_subset_0):
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+# Compute different statistics
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
 
-	y_df_subset_0_add_poly1[i] 	= each_df.apply(lambda x: x + poly1)
-	y_df_subset_0_add_perio_sin1[i] = each_df.apply(lambda x: x + perio_sin1)
-	y_df_subset_0_add_perio_cos1[i] = each_df.apply(lambda x: x + perio_cos1)
-	y_df_subset_0_add_exp1[i]	= each_df.apply(lambda x: x + exp1)
-	
+corr_stat = ["pear_corr", "dist_corr"]
+
+for i, each_y_0_label in enumerate(y_val_subset_0):
+	for j, each_add_label in enumerate(add_var):
+		
+		print("------------- " + each_y_0_label + " add " + each_add_label)
+		
+		y_val = y_df_subset_0_add[i,j]
+		
+		#-----------------------------------------
+		#'''
+		for each_corr in corr_stat:
+			print("----- " + each_corr)
+
+			result = pd.DataFrame(index = [0], columns = y_val.columns)
+			result.loc[0] = method.compute(x, y_val, stat = each_corr)
 			
+			result.to_csv(each_corr + "/y_" + each_y_0_label 
+				      + "_add_" + each_add_label + ".csv",
+				      index = False)
+		#'''
+		#-----------------------------------------
+		#'''
+		result = pd.DataFrame(index = mi_ksg_k, columns = y_val.columns)
+		
+		for j, each_k in enumerate(mi_ksg_k):
+			print("----")
+			print(each_k)
+			result.loc[each_k] = method.compute(x, y_val, 
+							    stat = 'mi_ksg', 
+							    k_val = each_k)
+		
+		result.to_csv('mi_ksg' + "/y_" + each_y_0_label
+			      + "_add_" + each_add_label + ".csv", 
+			      index = False)
+		#'''
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+
