@@ -231,6 +231,23 @@ y_df_subset_0 = [y_poly, y_perio_sin, y_perio_cos, y_exp]
 #-------------------------------------------
 
 poly1 = y_poly[1].values
-perio_sin1 = y_perio_sin1[1].values
-perio_cos1 = y_perio_cos1[1].values
+perio_sin1 = y_perio_sin[1].values
+perio_cos1 = y_perio_cos[1].values
 exp1 = y_exp[1].values
+
+#-------------------------------------------
+
+y_df_subset_0_add_poly1 	= [None]*len(y_df_subset_0)
+y_df_subset_0_add_perio_sin1 	= [None]*len(y_df_subset_0)
+y_df_subset_0_add_perio_cos1 	= [None]*len(y_df_subset_0)
+y_df_subset_0_add_exp1 		= [None]*len(y_df_subset_0)
+
+
+for i, each_df in enumerate(y_df_subset_0):
+
+	y_df_subset_0_add_poly1[i] 	= each_df.apply(lambda x: x + poly1)
+	y_df_subset_0_add_perio_sin1[i] = each_df.apply(lambda x: x + perio_sin1)
+	y_df_subset_0_add_perio_cos1[i] = each_df.apply(lambda x: x + perio_cos1)
+	y_df_subset_0_add_exp1[i]	= each_df.apply(lambda x: x + exp1)
+	
+			
