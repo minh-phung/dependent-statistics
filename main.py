@@ -35,11 +35,11 @@ wave_num = range(1, 50)
 sin_val = np.column_stack([np.sin(k*x) for k in wave_num])
 cos_val = np.column_stack([np.cos(k*x) for k in wave_num])
 
-y_sin = pd.DataFrame(data = sin_val, columns = wave_num)
-y_cos = pd.DataFrame(data = cos_val, columns = wave_num)
+y_perio_sin = pd.DataFrame(data = sin_val, columns = wave_num)
+y_perio_cos = pd.DataFrame(data = cos_val, columns = wave_num)
 
 #-------------------------------------------
-rate = np.linspace(-5, 5, 10)
+rate = np.linspace(5, 0, 20, endpoint = False)
 
 exp_val = np.column_stack([np.exp(k*x) for k in rate])
 
@@ -56,15 +56,19 @@ y_noise_uni = pd.DataFrame(data = np.random.uniform(low = -1, high = 1, size = n
 			   columns = [0])
 
 #-------------------------------------------
-y_noise_gaus = pd.DataFrame(data = np.random.normal(loc = 0, scale = 0.25, size = n),
+y_noise_gaus_sym = pd.DataFrame(data = np.random.normal(loc = 0, scale = 0.25, size = n),
+			    columns = [0])
+
+#-------------------------------------------
+y_noise_gaus_asym = pd.DataFrame(data = np.random.normal(loc = 1, scale = 0.25, size = n),
 			    columns = [0])
 
 #-----------------------------------------------------------------------------------
-y_var = ["poly", "sin", "cos", "exp", "gaus",
-	"noise_uni", "noise_gaus"]
+y_var = ["poly", "perio_sin", "perio_cos", "exp", "gaus",
+	"noise_uni", "noise_gaus_sym", "noise_gaus_asym"]
 
-y_df = [y_poly, y_sin, y_cos, y_exp, y_gaus,
-	y_noise_uni, y_noise_gaus]
+y_df = [y_poly, y_perio_sin, y_perio_cos, y_exp, y_gaus,
+	y_noise_uni, y_noise_gaus_sym, y_noise_gaus_asym]
 
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
@@ -83,6 +87,7 @@ for each_stat in stat:
 	
 		each_result.to_csv(each_stat + "/y_" + each_y + ".csv", index = False)
 '''
+
 #-------------------------------------------
 stat = "mi_ksg"
 
@@ -103,51 +108,129 @@ for i, each_y in enumerate(y_var):
 
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
-# Plot
+# Plot: each y in subset 0 with each in subset 1
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
 
-y_val_subset_0 = ["poly", "sin", "cos", "exp"]
-y_val_subset_1 = ["gaus", "noise_uni", "noise_gaus"]
+y_val_subset_0 = ["poly", "perio_sin", "perio_cos", "exp"]
+y_val_subset_1 = ["gaus", "noise_uni", "noise_gaus_sym", "noise_gaus_asym"]
+
+'''
+for y_0 in y_val_subset_0:
+	print("------------------ " + y_0)
+	
+	#---------------------
+	y_0_pear_corr_df = pd.read_csv("pear_corr/y_" + y_0 + ".csv")
+	y_0_pear_corr_abs_val = np.abs(y_0_pear_corr_df.values).flatten()	
+
+	#---------------------
+	y_0_dist_corr_df = pd.read_csv("dist_corr/y_" + y_0 + ".csv")
+	y_0_dist_corr_val = y_0_dist_corr_df.values.flatten()
+
+	#---------------------
+	x_val = y_0_pear_corr_df.columns.astype(float)
+	
+	for y_1 in y_val_subset_1:
+		print("-------- " + y_1)
+		
+		#---------------------
+		y_1_pear_corr_df = pd.read_csv("pear_corr/y_" + y_1 + ".csv")
+		y_1_pear_corr_abs_val = np.abs(y_1_pear_corr_df.values).item()
+		
+		#---------------------
+		y_1_dist_corr_df = pd.read_csv("dist_corr/y_" + y_1 + ".csv")
+		y_1_dist_corr_val = y_1_dist_corr_df.values.item()
+		
+		#---------------------
+		plt.scatter(x_val, y_0_pear_corr_abs_val,
+			    color = "blue", 
+			    label = "abs(pear_corr)")
+		plt.scatter(x_val, y_0_dist_corr_val,
+			    color = "red", 
+			    label = "dist_corr")
+		
+		plt.axhline(y_1_pear_corr_abs_val,
+			    color = "blue", linestyle = '--', 
+			    label = y_1 + " abs(pear_corr)")
+		plt.axhline(y_1_dist_corr_val,
+			    color = "red", linestyle = '--',
+			    label = y_1 + " dist_corr")
+		
+		plt.title(y_0)
+		plt.xlabel("parameter")
+		plt.ylabel("correlation value")
+		
+		plt.legend()
+		plt.ylim(0,1)
+		plt.savefig("plot/each_y/" + y_0 + "_corr_" + y_1)
+		
+		plt.close()
+'''		
+#-------------------------------------------
+
+'''
+for y_0 in y_val_subset_0:
+	print("------------------ " + y_0)
+	
+	y_0_mi_df = pd.read_csv("mi_ksg/y_" + y_0 + ".csv")
+	
+	y_0_mi_mean = np.mean(y_0_mi_df, axis = 0).values
+	y_0_mi_q95 = np.quantile(y_0_mi_df, 0.95, axis = 0)
+	y_0_mi_q5  = np.quantile(y_0_mi_df, 0.05, axis = 0)
+
+	x_val = y_0_mi_df.columns.astype(float)
+	
+	
+	for y_1 in y_val_subset_1:
+		print("-------- " + y_1)
+		y_1_mi = pd.read_csv("mi_ksg/y_" + y_1 + ".csv").values
+		
+		y_1_mi_mean = np.mean(y_1_mi)
+		y_1_mi_q95 = np.quantile(y_1_mi, 0.95)
+		y_1_mi_q5  = np.quantile(y_1_mi, 0.05)
+		
+		#-------------------------------
+
+		plt.errorbar(
+			x_val, y_0_mi_mean,
+			yerr = [y_0_mi_mean - y_0_mi_q5,
+				y_0_mi_q95 - y_0_mi_mean],
+			label = "mean (95th - 5th)",
+			color = "red"
+		)
+
+		plt.axhline(y_1_mi_mean,
+			    color = "blue", linestyle = '--',
+			    label = y_1 + " mean (95th - 5th)")
+		plt.axhline(y_1_mi_q95,
+			    color = "blue", linestyle = '--')
+		plt.axhline(y_1_mi_q5,
+			    color = "blue", linestyle = '--')
+	
+		
+		plt.title(y_0)
+		plt.xlabel("parameter")
+		plt.ylabel("mi_ksg score")
+
+		plt.legend()
+		plt.savefig("plot/each_y/" + y_0 + "_mi_" + y_1)
+		plt.close()
+'''
+
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+# Compute 
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
 
 
-mi_quantile = 0.95
-scaler = MinMaxScaler()
+y_val_subset_0 = ["poly", "perio_sin", "perio_cos", "exp"]
 
-for each_y_0 in y_val_subset_0:
-	print(each_y + " ------------")
-	
-	# ------------------
-	pear_corr_df = pd.read_csv("pear_corr/y_" + each_y_0 + ".csv")
-	
-	pear_corr_abs_val = np.abs(pear_corr_df.values).flatten()
-	
-	# ------------------
-	dist_corr_df = pd.read_csv("dist_corr/y_" + each_y_0 + ".csv")
-	
-	dist_corr_val = dist_corr_df.values.flatten()
+y_df_subset_0 = [y_poly, y_perio_sin, y_perio_cos, y_exp]
 
-	# -------------------------------------
-	x_val = pear_corr_df.columns.astype(float)
-	
-	plt.scatter(x_val, pear_corr_abs_val, 
-		    color = "red", label = "abs(pear_corr)")
-	
-	plt.scatter(x_val, dist_corr_val,
-		    color = "blue", label = "dist_corr")
-	
-	
-	
+#-------------------------------------------
 
-	plt.title(each_y)
-	plt.xlabel("parameter")
-	plt.ylabel("score")
-
-	plt.ylim(0, 1)
-	plt.legend()
-
-	plt.savefig("plot/" + each_y_0 + "_corr.png")
-	plt.close()
-
-	
-	
+poly1 = y_poly[1].values
+perio_sin1 = y_perio_sin1[1].values
+perio_cos1 = y_perio_cos1[1].values
+exp1 = y_exp[1].values
