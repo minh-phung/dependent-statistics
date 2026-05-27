@@ -231,10 +231,10 @@ y_df_subset_0 = [y_poly, y_perio_sin, y_perio_cos, y_exp]
 poly1 = y_poly[1].values
 perio_sin1 = y_perio_sin[1].values
 perio_cos1 = y_perio_cos[1].values
-exp1 = y_exp[1].values
+exp025 = y_exp[1].values
 
-add_var = ["poly1", "perio_sin1", "perio_cos1", "exp1"]
-add_val = [poly1, perio_sin1, perio_cos1, exp1]
+add_var = ["poly1", "perio_sin1", "perio_cos1", "exp025"]
+add_val = [poly1, perio_sin1, perio_cos1, exp025]
 
 #-------------------------------------------
 
@@ -252,6 +252,7 @@ for i, each_y_0 in enumerate(y_df_subset_0):
 
 corr_stat = ["pear_corr", "dist_corr"]
 
+'''
 for i, each_y_0_label in enumerate(y_val_subset_0):
 	for j, each_add_label in enumerate(add_var):
 		
@@ -260,7 +261,7 @@ for i, each_y_0_label in enumerate(y_val_subset_0):
 		y_val = y_df_subset_0_add[i,j]
 		
 		#-----------------------------------------
-		#'''
+		
 		for each_corr in corr_stat:
 			print("----- " + each_corr)
 
@@ -270,9 +271,9 @@ for i, each_y_0_label in enumerate(y_val_subset_0):
 			result.to_csv(each_corr + "/y_" + each_y_0_label 
 				      + "_add_" + each_add_label + ".csv",
 				      index = False)
-		#'''
+		
 		#-----------------------------------------
-		#'''
+		
 		result = pd.DataFrame(index = mi_ksg_k, columns = y_val.columns)
 		
 		for j, each_k in enumerate(mi_ksg_k):
@@ -285,7 +286,141 @@ for i, each_y_0_label in enumerate(y_val_subset_0):
 		result.to_csv('mi_ksg' + "/y_" + each_y_0_label
 			      + "_add_" + each_add_label + ".csv", 
 			      index = False)
-		#'''
-#-----------------------------------------------------------------------------------
-#-----------------------------------------------------------------------------------
+		
+'''
 
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+# Plot
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+corr_stat = ["pear_corr", "dist_corr"]
+
+add_var_color = ['blue', 'green', 'orange', 'yellow']
+
+'''
+
+for i, each_y_0 in enumerate(y_val_subset_0):
+	print("------------------ " + each_y_0)
+	
+	for each_corr_stat in corr_stat:
+		print(each_corr_stat)
+		
+		y_0_corr_df = pd.read_csv(each_corr_stat + "/y_" + 
+					  each_y_0 + ".csv")
+		
+		y_0_corr_val = y_0_corr_df.values.flatten()
+
+		x_0_corr_val = y_0_corr_df.columns.astype(float)
+		# -------------------------------------
+
+		plt.scatter(x_0_corr_val, y_0_corr_val,
+			    color = 'red',
+			    label = "y")
+
+		# -------------------------------------
+
+		for j, each_add_label in enumerate(add_var):
+			
+			y_0_add_corr_val = pd.read_csv(each_corr_stat + "/y_" +
+					   each_y_0 + "_add_" + each_add_label +
+					   ".csv").values.flatten()
+			
+			plt.scatter(x_0_corr_val, y_0_add_corr_val,
+				    color = add_var_color[j],
+				    label = "y + " + each_add_label,
+				    s = 10)
+
+		plt.legend()
+		plt.title(each_y_0)
+		plt.xlabel("parameter")
+		plt.ylabel(each_corr_stat)
+		
+		if each_corr_stat == 'pear_corr':
+			plt.ylim(-1, 1)
+		else:
+			plt.ylim(0,1)
+					
+		plt.savefig('plot/each_y_add_basis/' + each_y_0 
+			    + "_" + each_corr_stat + ".png")
+		plt.close()
+		
+'''
+#-------------------------------------------
+
+mi_ksg_q = [0.95, 0.05]
+
+for i, each_y_0 in enumerate(y_val_subset_0):
+	print("------------------ " + each_y_0)
+	
+	y_0_mi_df = pd.read_csv("mi_ksg/y_" + each_y_0 + ".csv")
+	
+	x_0 = y_0_mi_df.columns.astype(float)
+
+	# -------------------------------------
+	
+	y_0_mi_mean = np.mean(y_0_mi_df, axis = 0).values
+
+	plt.scatter(x_0, y_0_mi_mean,
+		    color = 'red',
+		    label = "y")
+
+	for j, each_add_label in enumerate(add_var):
+		print(each_add_label)
+		
+		y_0_add_mi_df = pd.read_csv("mi_ksg/y_" + each_y_0 + "_add_" 
+					    + each_add_label + ".csv")
+
+		y_0_add_mi_mean = np.mean(y_0_add_mi_df, axis = 0).values
+		
+		plt.scatter(x_0, y_0_add_mi_mean,
+			    color = add_var_color[j],
+			    label = "y + " + each_add_label,
+			    s = 10)
+
+	plt.legend()
+	plt.title(each_y_0)
+	plt.xlabel("parameter")
+	plt.ylabel("mi_ksg - mean")
+
+	plt.savefig('plot/each_y_add_basis/' + each_y_0 
+		    + "_mi_ksg_mean.png")
+	plt.close()
+
+	# -------------------------------------
+	
+	for each_q in mi_ksg_q:
+		print("mi " + each_q)
+		
+		y_0_mi_q = np.quantile(y_0_mi_df, each_q, axis = 0)
+		
+		plt.scatter(x_0, y_0_mi_q,
+			    color = 'red',
+			    label = 'y')
+
+		for j, each_add_label in enumerate(add_var):
+			y_0_add_mi_df = pd.read_csv("mi_ksg/y_" + each_y_0 + "_add_" 
+						    + each_add_label + ".csv")
+
+			y_0_add_mi_q = np.quantile(y_0_add_mi_df, each_q, axis = 0)
+			
+			plt.scatter(x_0, y_0_add_mi_q,
+				    color = add_var_color[j],
+				    label = "y + " + each_add_label,
+				    s = 10)
+		
+		plt.legend()
+		plt.title(each_y_0)
+		plt.xlabel("parameter")
+		plt.ylabel("mi_ksg - " + each_q + " quantile")
+
+		
+		
+
+			
+	
+	
+	
+	exit()
+		
+		
