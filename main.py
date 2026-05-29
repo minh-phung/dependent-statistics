@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import method
+import noise
+
 from scipy.stats import norm
 from sklearn.preprocessing import MinMaxScaler
 
@@ -347,7 +349,7 @@ for i, each_y_0 in enumerate(y_val_subset_0):
 		
 '''
 #-------------------------------------------
-
+'''
 mi_ksg_q = [0.95, 0.05]
 
 for i, each_y_0 in enumerate(y_val_subset_0):
@@ -390,7 +392,7 @@ for i, each_y_0 in enumerate(y_val_subset_0):
 	# -------------------------------------
 	
 	for each_q in mi_ksg_q:
-		print("mi " + each_q)
+		print("mi " + str(each_q))
 		
 		y_0_mi_q = np.quantile(y_0_mi_df, each_q, axis = 0)
 		
@@ -412,15 +414,30 @@ for i, each_y_0 in enumerate(y_val_subset_0):
 		plt.legend()
 		plt.title(each_y_0)
 		plt.xlabel("parameter")
-		plt.ylabel("mi_ksg - " + each_q + " quantile")
+		plt.ylabel("mi_ksg - " + str(each_q) + " quantile")
+		
+		plt.savefig('plot/each_y_add_basis/' + each_y_0 
+			    + "_mi_ksg_" + str(each_q) + ".png")
 
 		
-		
+		plt.close()
 
-			
-	
-	
+
+'''
+
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+# Compute homo- and heteroscedasticity
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+
+y_poly_add_noise0 = pd.DataFrame(index = range(n), columns = poly_order)
+
+for each_col in y_poly_add_noise0:
+	print("----------- " + str(each_col))
+
+	y_poly_add_noise0[each_col] = noise.add(y_poly[each_col], 
+						'gaus', std_frac = 0.10, order = 0)
 	
 	exit()
-		
-		
+
