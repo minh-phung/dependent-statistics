@@ -431,13 +431,29 @@ for i, each_y_0 in enumerate(y_val_subset_0):
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
 
-y_poly_add_noise0 = pd.DataFrame(index = range(n), columns = poly_order)
+y_val_subset_0 = ["poly", "perio_sin", "perio_cos", "exp"]
+y_df_subset_0 = [y_poly, y_perio_sin, y_perio_cos, y_exp]
 
-for each_col in y_poly_add_noise0:
-	print("----------- " + str(each_col))
+#------------------------------------------------
 
-	y_poly_add_noise0[each_col] = noise.add(y_poly[each_col], 
-						'gaus', std_frac = 0.10, order = 0)
-	
-	exit()
+add_noise_uni_std_frac = [0.5, 1]
+
+y_df_subset_0_add_noise_uni =  np.full((len(y_val_subset_0), 
+					len(add_noise_uni_std_frac)), 
+					None, dtype = object)
+
+
+for i, each_y_0 in enumerate(y_df_subset_0):
+	for j, each_uni_std_frac in enumerate(add_noise_uni_std_frac):
+
+		print("--------- " + str(each_uni_std_frac))
+		
+		y_df_subset_0_add_noise_uni[i,j] = each_y_0.apply(lambda x :
+			noise.add(x, type = 'uni', std_frac = each_uni_std_frac)	
+		)
+
+#------------------------------------------------
+
+add_noise_gaus_order = [0, 1, 2]
+add_noise_gaus_std_frac = [0.5, 1]
 
