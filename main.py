@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import method
 import noise
+import time
 
 from scipy.stats import norm
 from sklearn.preprocessing import MinMaxScaler
@@ -435,25 +436,179 @@ y_val_subset_0 = ["poly", "perio_sin", "perio_cos", "exp"]
 y_df_subset_0 = [y_poly, y_perio_sin, y_perio_cos, y_exp]
 
 #------------------------------------------------
+#------------------------------------------------
 
 add_noise_uni_std_frac = [0.5, 1]
 
-y_df_subset_0_add_noise_uni =  np.full((len(y_val_subset_0), 
-					len(add_noise_uni_std_frac)), 
-					None, dtype = object)
+#------------------------------------------------
+y_df_subset_0_add_noise_uni =  np.full(
+	(len(y_val_subset_0), 
+	 len(add_noise_uni_std_frac)), 
+	None, dtype = object
+)
 
 
 for i, each_y_0 in enumerate(y_df_subset_0):
 	for j, each_uni_std_frac in enumerate(add_noise_uni_std_frac):
 
-		print("--------- " + str(each_uni_std_frac))
+		#print("--------- uni std frac " + str(each_uni_std_frac))
 		
 		y_df_subset_0_add_noise_uni[i,j] = each_y_0.apply(lambda x :
 			noise.add(x, type = 'uni', std_frac = each_uni_std_frac)	
 		)
 
 #------------------------------------------------
+#------------------------------------------------
 
-add_noise_gaus_order = [0, 1, 2]
 add_noise_gaus_std_frac = [0.5, 1]
+add_noise_gaus_order = [0, 1, 2]
+
+#------------------------------------------------
+
+y_df_subset_0_add_noise_gaus = np.full(
+	(len(y_val_subset_0), 
+	 len(add_noise_gaus_std_frac), 
+	 len(add_noise_gaus_order)),
+	None, dtype = object
+)
+
+for i, each_y_0 in enumerate(y_df_subset_0):
+	#print("----------------------------- each_y_0: " + y_val_subset_0[i])
+	
+	for j, each_std_frac in enumerate(add_noise_gaus_std_frac):
+		#print("---------------- each_std_frac: " + str(each_std_frac))
+
+		for k, each_order in enumerate(add_noise_gaus_order):
+			#print("-------------- each_order: " + str(each_order))
+			
+			y_df_subset_0_add_noise_gaus[i,j,k] = each_y_0.apply(
+				lambda x :
+				noise.add(x, type = 'gaus',
+					  std_frac = each_std_frac,
+					  order = each_order)
+			)
+
+
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+# Compute different statistics
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+
+corr_stat = ["pear_corr", "dist_corr"]
+
+'''
+for i, each_y_0_label in enumerate(y_val_subset_0):
+	for j, each_uni_std_frac in enumerate(add_noise_uni_std_frac):
+
+		print(each_y_0_label + " - uni - std_frac " + str(each_uni_std_frac))
+
+		y_val = y_df_subset_0_add_noise_uni[i,j]		
+		
+		#-------------------------------------------
+
+		for each_corr in corr_stat:
+			print("----------- " + each_corr)
+
+			result = pd.DataFrame(index = [0], columns = y_val.columns)
+			result.loc[0] = method.compute(x, y_val, stat = each_corr)
+			
+			result.to_csv(
+				each_corr + "/y_" + 
+				each_y_0_label + 
+				"_noise_uni_stdfrac_" + str(each_uni_std_frac) + 
+				".csv",
+				index = False
+			)
+			print(result)
+		
+		#-------------------------------------------
+
+		result = pd.DataFrame(index = mi_ksg_k, columns = y_val.columns)
+		
+		print("----------- mi_ksg")
+
+		for j, each_k in enumerate(mi_ksg_k):
+			#print("----")
+			print(each_k)
+			result.loc[each_k] = method.compute(x, y_val, 
+							    stat = 'mi_ksg', 
+							    k_val = each_k)
+		print(result)
+
+		result.to_csv(
+			"mi_ksg/y_" + each_y_0_label
+			+ "_noise_uni_stdfrac_" + str(each_uni_std_frac) + 
+			".csv",
+			index = False
+		)
+			
+'''
+
+#------------------------------------------------
+#------------------------------------------------
+
+'''
+for i, each_y_0_label in enumerate(y_val_subset_0):
+	
+	for j, each_std_frac in enumerate(add_noise_gaus_std_frac):
+		
+		for k, each_order in enumerate(add_noise_gaus_order):
+			
+			print(
+				each_y_0_label + 
+				" - std frac: " + str(each_std_frac) +
+				" - noise order: " + str(each_order)
+			)
+
+			y_val = y_df_subset_0_add_noise_gaus[i,j,k]
+
+			#-------------------------------------------
+
+			for each_corr in corr_stat:
+				print("----------- " + each_corr)
+
+				result = pd.DataFrame(index = [0], columns = y_val.columns)
+				result.loc[0] = method.compute(x, y_val, stat = each_corr)
+			
+				result.to_csv(
+					each_corr + "/y_" +
+					each_y_0_label +
+					"_noise_gaus_stdfrac_" + str(each_std_frac) +
+					"_order_" + str(each_order) + 
+					".csv",
+					index = False
+				)
+				print(result)
+		
+			#-------------------------------------------
+
+			result = pd.DataFrame(index = mi_ksg_k, columns = y_val.columns)
+		
+			print("----------- mi_ksg")
+
+			for each_k in mi_ksg_k:
+				#print("----")
+				print(each_k)
+				result.loc[each_k] = method.compute(x, y_val, 
+								    stat = 'mi_ksg', 
+								    k_val = each_k)
+			print(result)
+
+			result.to_csv(
+				"mi_ksg/y_" +
+				each_y_0_label +
+				"_noise_gaus_stdfrac_" + str(each_std_frac) +
+				"_order_" + str(each_order) + 
+				".csv",
+				index = False
+			)
+
+'''
+
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
+# Plot
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
 
