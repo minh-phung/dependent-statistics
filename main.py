@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import method
 import noise
-import time
 
 from scipy.stats import norm
 from sklearn.preprocessing import MinMaxScaler
@@ -612,3 +611,238 @@ for i, each_y_0_label in enumerate(y_val_subset_0):
 #-----------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------
 
+corr_stat = ["pear_corr", "dist_corr"]
+
+uni_noise_color = ['blue', 'green']
+
+#-----------------------------------------------------
+'''
+for each_y_0_label in y_val_subset_0:
+	
+	for each_corr in corr_stat:
+		
+		y_0_corr_df = pd.read_csv(
+			each_corr + "/y_" +
+			each_y_0_label + ".csv"
+		)
+		
+		y_0_corr_val = y_0_corr_df.values
+
+		x_0_corr_val = y_0_corr_df.columns.astype(float)
+
+		#-------------------------------
+
+		plt.scatter(x_0_corr_val, y_0_corr_val,
+			color = 'red',
+			label = 'y'
+		)
+
+		#-------------------------------
+
+		for i, each_uni_std_frac in enumerate(add_noise_uni_std_frac):
+
+			y_0_corr_df_noise = pd.read_csv(
+				each_corr + "/y_" +
+				each_y_0_label + "_noise_uni_stdfrac_" +
+				str(each_uni_std_frac) + ".csv"
+			)
+			
+			y_0_corr_noise_val = y_0_corr_df_noise.values
+
+			plt.scatter(x_0_corr_val, y_0_corr_noise_val,
+				color = uni_noise_color[i],
+				label = 'y + uni_noise, std_frac:' + 
+				str(each_uni_std_frac),
+				s = 10
+			)
+		
+		plt.legend()
+		plt.title(each_y_0_label)
+		plt.xlabel("parameter")
+		plt.ylabel(each_corr)
+
+		if each_corr == 'pear_corr':
+			plt.ylim(-1, 1)
+		else:
+			plt.ylim(0,1)
+
+		
+		plt.savefig("plot/each_y_add_noise/" + 
+			each_y_0_label + "_uni_" +
+			each_corr + ".png"
+		)
+		
+		plt.close()
+
+'''	
+#-----------------------------------------------------
+
+mi_ksg_q = [0.95, 0.05]
+
+'''
+for each_y_0_label in y_val_subset_0:	
+	
+	print("------")
+	print(each_y_0_label)
+
+	y_0_mi_df = pd.read_csv(
+		"mi_ksg/y_" + each_y_0_label + ".csv"
+	)
+	
+	x_0 = y_0_mi_df.columns.astype(float).values
+
+	#-------------------------------
+	
+	y_0_mi_mean = y_0_mi_df.mean(axis = 0).values
+
+	plt.scatter(
+		x_0, y_0_mi_mean,
+		color = 'red',
+		label = 'y'
+	)
+	
+	
+	for i, each_uni_std_frac in enumerate(add_noise_uni_std_frac):
+		
+		y_0_mi_noise_uni_df = pd.read_csv(
+			"mi_ksg/y_" + each_y_0_label +
+			"_noise_uni_stdfrac_" + str(each_uni_std_frac) +
+			".csv"
+		)
+
+		y_0_mi_noise_uni_mean = y_0_mi_noise_uni_df.mean(axis = 0).values
+		
+		plt.scatter(
+			x_0, y_0_mi_noise_uni_mean,
+			color = uni_noise_color[i],
+			label = 'y + uni noise, std frac:' + str(each_uni_std_frac),
+			s = 10
+		)
+
+	plt.legend()
+	plt.xlabel("parameter")
+	plt.ylabel("mi_ksg - mean")
+	plt.savefig(
+		"plot/each_y_add_noise/" + 
+		each_y_0_label + "_uni_mi_ksg_mean.png"
+	)
+
+	plt.close()
+	
+	#-------------------------------
+	
+	for each_q in mi_ksg_q:
+		
+		y_0_mi_q = y_0_mi_df.quantile(q = each_q, axis = 0)
+
+		plt.scatter(
+			x_0, y_0_mi_q,
+			color = 'red',
+			label = 'y'
+		)
+
+		for i, each_uni_std_frac in enumerate(add_noise_uni_std_frac):
+			
+			y_0_mi_noise_uni_df = pd.read_csv(
+				"mi_ksg/y_" + each_y_0_label +
+				"_noise_uni_stdfrac_" + str(each_uni_std_frac) +
+				".csv"
+			)
+
+			y_0_mi_noise_uni_q = y_0_mi_noise_uni_df.quantile(
+				q = each_q, axis = 0
+			).values
+			
+			plt.scatter(
+				x_0, y_0_mi_noise_uni_q,
+				color = uni_noise_color[i],
+				label = 'y + uni noise, std frac:' + 
+				str(each_uni_std_frac),
+				s = 10
+			)
+		
+		
+		plt.legend()
+		plt.xlabel("parameter")
+		plt.ylabel("mi_ksg - " + str(each_q) + " quantile")
+		plt.savefig(
+			"plot/each_y_add_noise/" + 
+			each_y_0_label + "_uni_mi_ksg_" + 
+			str(each_q) + ".png"
+		)
+	
+		plt.close()
+		
+'''
+#-----------------------------------------------------
+#-----------------------------------------------------
+
+gaus_color = ['blue', 'green', 'orange']
+
+
+for each_y_0_label in y_val_subset_0:
+	
+	for each_corr in corr_stat:
+		
+		y_0_corr_df = pd.read_csv(
+			each_corr + "/y_" +
+			each_y_0_label + ".csv"
+		)
+		
+		y_0_corr_val = y_0_corr_df.values
+		x_0_corr_val = y_0_corr_df.columns.astype(float)
+
+
+		for each_std_frac in add_noise_gaus_std_frac:
+
+			plt.scatter(
+				x_0_corr_val, y_0_corr_val,
+				color = 'red',
+				label = "y"
+			)
+
+			for i, each_order in enumerate(add_noise_gaus_order):
+				
+				y_0_corr_noise_std_order_val = pd.read_csv(
+					each_corr + "/y_" + 
+					each_y_0_label + 
+					"_noise_gaus_stdfrac_" + str(each_std_frac) + 
+					"_order_" + str(each_order) + ".csv"
+				).values
+
+				plt.scatter(
+					x_0_corr_val, y_0_corr_noise_std_order_val,
+					color = gaus_color[i],
+					label = "y + gaus noise, std frac: " + 
+						str(each_std_frac) + ", order: " + 
+						str(each_order),
+					s = 10
+				)
+
+			plt.legend()
+			plt.title(each_y_0_label)
+			plt.xlabel("parameter")
+			plt.ylabel(each_corr)
+
+			if each_corr == 'pear_corr':
+				plt.ylim(-1, 1)
+			else:
+				plt.ylim(0,1)
+
+		
+			plt.savefig("plot/each_y_add_noise/" + 
+				each_y_0_label + "_gaus_" +
+				each_corr + "_stdfrac_" + 
+				str(each_std_frac) + ".png"
+			)
+			
+			plt.close()
+
+#-----------------------------------------------------
+
+for each_y_0_label in y_val_subset_0:
+	
+	
+		
+
+		
