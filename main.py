@@ -682,9 +682,6 @@ mi_ksg_q = [0.95, 0.05]
 '''
 for each_y_0_label in y_val_subset_0:	
 	
-	print("------")
-	print(each_y_0_label)
-
 	y_0_mi_df = pd.read_csv(
 		"mi_ksg/y_" + each_y_0_label + ".csv"
 	)
@@ -779,7 +776,7 @@ for each_y_0_label in y_val_subset_0:
 
 gaus_color = ['blue', 'green', 'orange']
 
-
+'''
 for each_y_0_label in y_val_subset_0:
 	
 	for each_corr in corr_stat:
@@ -837,12 +834,122 @@ for each_y_0_label in y_val_subset_0:
 			)
 			
 			plt.close()
-
+'''
 #-----------------------------------------------------
 
 for each_y_0_label in y_val_subset_0:
 	
+	y_0_mi_df = pd.read_csv(
+		"mi_ksg/y_" + each_y_0_label + ".csv"
+	)
+	
+	x_0 = y_0_mi_df.columns.astype(float).values
+	
+
+	'''
+	#-------------------------------
+	
+	y_0_mi_mean = y_0_mi_df.mean(axis = 0).values
+	
+
+	for each_std_frac in add_noise_gaus_std_frac:
+
+		plt.scatter(
+			x_0, y_0_mi_mean,
+			color = 'red',
+			label = "y"
+		)
+		
+		for i, each_order in enumerate(add_noise_gaus_order):
+			
+			y_0_mi_noise_std_order_df = pd.read_csv(
+				"mi_ksg/y_" + 
+				each_y_0_label + 
+				"_noise_gaus_stdfrac_" + str(each_std_frac) + 
+				"_order_" + str(each_order) + ".csv"
+			)
+
+			y_0_mi_noise_std_order_mean = y_0_mi_noise_std_order_df.mean(
+				axis = 0
+			).values
+
+			plt.scatter(
+				x_0, y_0_mi_noise_std_order_mean,
+				color = gaus_color[i],
+				label = "y + gaus noise, std frac: " + 
+					str(each_std_frac) + ", order: " + 
+					str(each_order),
+					s = 10
+			)
+
+		plt.legend()
+		plt.xlabel("parameter")
+		plt.ylabel("mi_ksg - mean")
+		plt.savefig(
+			"plot/each_y_add_noise/" + 
+			each_y_0_label + "_gaus_mi_ksg_stdfrac_" + 
+			str(each_std_frac) + "_mean.png"
+		)
+
+		plt.close()
+
+	'''
+	for each_q in mi_ksg_q:
+		
+		y_0_mi_q = y_0_mi_df.quantile(
+			q = each_q, axis = 0
+		).values
+		
+		for each_std_frac in add_noise_gaus_std_frac:
+
+			plt.scatter(
+				x_0, y_0_mi_q,
+				color = 'red',
+				label = "y"
+			)
+
+			for i, each_order in enumerate(add_noise_gaus_order):
+			
+				y_0_mi_noise_std_order_df = pd.read_csv(
+					"mi_ksg/y_" + 
+					each_y_0_label + 
+					"_noise_gaus_stdfrac_" + str(each_std_frac) + 
+					"_order_" + str(each_order) + ".csv"
+				)
+
+				y_0_mi_noise_std_order_q = y_0_mi_noise_std_order_df.quantile(
+					q = each_q, axis = 0
+				)
+
+				plt.scatter(
+					x_0, y_0_mi_noise_std_order_q,
+					color = gaus_color[i],
+					label = "y + gaus noise, std frac: " + 
+						str(each_std_frac) + ", order: " + 
+						str(each_order),
+						s = 10
+
+				)
+
+			plt.legend()
+			plt.xlabel("parameter")
+			plt.ylabel("mi_ksg - " + str(each_q) + " quantile")
+			plt.savefig(
+				"plot/each_y_add_noise/" + 
+				each_y_0_label + "_gaus_mi_ksg_stdfrac_" + 
+				str(each_std_frac) + "_" + 
+				str(each_q) + ".png"
+			)
+
+			plt.close()
+
+
+				
 	
 		
+
+ 	
+	
+	
 
 		
