@@ -6,3 +6,5 @@ There exists many dependent statistics. A few includes:
 - Pearson Correlation Coefficient: used to determnine linear dependent, taking values $$[-1,1]$$, where 0 determines no dependent, with $$1$$ or $$-1$$ as perfect positive or negative linear correlation.
 - Distance Correlation: used to determine dependent, taking values $$[0, 1]$$, where $$0$$ determines independent and $$1$$ for complete dependent.
 - Mutual Information: used to determine dependent, where $$0$$ determines independent and $$>0$$ for dependent - depends on the type of random variable (discrete vs. continuous)
+
+Choosing which and how to use them becomes a question in itself - are there situations where one statistics is prefered over another? From the three listed above, there exists two classes: statistics that can identify linear dependent, and those that can identify non-linear dependent.
