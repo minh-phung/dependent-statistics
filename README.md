@@ -1,5 +1,5 @@
 Dependent statistics are often used in feature selection, aiding the process of choosing a subsets of predictors, to both avoid overfitting and lower computational overhead. There exists many dependent statistics. A few includes: 
-- Pearson Correlation Coefficient: used to determnine linear dependent, taking values $$[-1,1]$$, where 0 determines no dependent, with $$1$$ or $$-1$$ as perfect positive or negative linear correlation (numpy.corrcoef).
+- Pearson Correlation Coefficient: used to determnine linear dependent, taking values $$[-1,1]$$, where 0 determines no linear dependent, with $$1$$ or $$-1$$ as perfect positive or negative linear correlation (numpy.corrcoef).
 - Distance Correlation: used to determine dependent, taking values $[0, 1]$, where $0$ determines independent and $1$ for complete dependent (statsmodels.stats.dist_dependence_measures.distance_correlation).
 - Mutual Information: used to determine dependent, taking values $[0,\infty)$, where $0$ determines independent and $>0$ for dependent (KSG - infomeasure).
 
