@@ -18,6 +18,6 @@ Futhermore, following the additive model assumption, each set of basis are added
 
 Finally, in looking at the effect of $\epsilon$ has on $f(x)$, as a function the standard deviation of the associated $f(x)$, two types of $\epsilon$ noise are added:
 - Uniform: $\epsilon \sim U(p, q)$, where $p, q$ are the appropriate bound to set the standard deviation to be a $`\{0.5, 1\}`$ fraction of the standard deviation of $f(x)$.
-- Gaussian: $\epsilon \sim N(0, l)$, where $l$ is set to be a $`\{0.5, 1\}`$ fraction of the standard deviation of $f(x), in cases where the standard deviation is constant, linearly increasing, and cubicly increasing (homoscedasticity vs. heteroscedasticity comparison).
+- Gaussian: $\epsilon \sim N(0, l)$, where $l$ is set to be a $`\{0.5, 1\}`$ fraction of the standard deviation of $f(x)$, in cases where the standard deviation is constant, linearly increasing, and cubicly increasing (homoscedasticity vs. heteroscedasticity comparison).
 
 Each statistics are plotted, in 'plot/each_y_add_noise'.
