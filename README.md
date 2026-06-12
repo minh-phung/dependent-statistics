@@ -13,7 +13,7 @@ Restricting the domain to $x \in [-1,1]$, four sets are chosen to be representat
 All three statistics listed above are computed, between $f(x)$ and $x$, for each elements in each set. Given that mutual information (in this case) is based on nearest-neighbour/have a hyperparameter, the chosen values are $k=1,..., 0.10 * n$, where $n = len(x)$, the number of $x$ points.
 
 The results are plotted in 'plot/each_y'. Since the absolute value of Pearson correlation and distance correlation would have the same range value, they are compared within the same plots. Mutual information are plotted separately. As a point of comparison, the associated dependent statistics of
-- Gaussian distribution $y \sim N(0, 0.25)$
+- Gaussian distribution $f(x) \sim N(0, 0.25)$
 - Uniform noise $\epsilon \sim U(-1, 1)$
 - Symmetric gaussian noise $\epsilon \sim N(0, 0.25)$
 - Asymmetric gaussian noise $\epsilon \sim N(1, 0.25)$
